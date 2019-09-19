@@ -12,7 +12,7 @@ class BloomFilter:
     '''
 
     def __init__(self, n):
-        self.p = 0.2
+        self.p = 0.05
         self.size = math.ceil(-n*math.log(self.p)/(math.log(2)**2))
         self.k = math.ceil(self.size/n*math.log(2))
         self.bit_array = [0] * self.size
@@ -44,20 +44,3 @@ class BloomFilter:
     # Returns the # of Hash Functions ie. h1(k), h2(k) ...
     def getNumberOfHashFunctions(self):
         return self.k
-
-
-no_of_lines = 10
-
-bloom_filter = BloomFilter(no_of_lines)
-bloom_filter.insert('First Line')
-bloom_filter.insert("bloom_filter.insert('Second Line')")
-bloom_filter.insert('Third Line')
-bloom_filter.insert('Fourth Line')
-bloom_filter.insert('Third Line')
-bloom_filter.insert('Fourth Line')
-
-print(bloom_filter.getBloomFilter())
-print(bloom_filter.getNumberOfHashFunctions())
-
-print(bloom_filter.validate('First Line'))
-print(bloom_filter.validate("bloom_filter.insert('Second Line')"))
