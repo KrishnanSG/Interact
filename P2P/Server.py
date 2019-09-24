@@ -7,14 +7,14 @@ print_lock = threading.Lock()
 
 def client_req():
 
-    PORT=5050
+    PORT=5051
 
     client = socket.socket()
     host = socket.gethostname()
 
-    client.connect((host,PORT))
+    client.connect(('192.168.43.166',PORT))
     client.send(b"Hi Server")
-    print("client listening on Port 5050 ...")
+    print("client listening on Port 5051 ...")
 
     with open('received_file', 'wb') as f:
         print('file opened')
@@ -88,6 +88,8 @@ def create_client_req():
         print_lock.release()
         exit()
 
+
+print()
 print_lock.acquire()
 start_new_thread(create_client_req, ())
 create_server()

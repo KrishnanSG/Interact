@@ -1,6 +1,6 @@
 import socket
 
-PORT = 5050
+PORT = 5051
 
 client = socket.socket()
 host = socket.gethostname()
@@ -8,7 +8,7 @@ host_ip = socket.gethostbyname(host)
 
 client.connect((host,PORT))
 client.send(b"Hi Server")
-print("client listening on Port 5050 ...")
+print("client listening on Port 5051 ...")
 
 with open('received_file', 'wb') as f:
     print('file opened')
