@@ -1,3 +1,6 @@
+# output BloomFilter file
+*.bin
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -103,4 +106,3 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-test

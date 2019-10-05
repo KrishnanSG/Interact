@@ -1,34 +1,35 @@
 from BloomFilter import BloomFilter
+import sys
 
-# Note to be implemented  using Command line arguments
+# Get filename for sync
+try:
+    filename = sys.argv[1]
+except IndexError:
+    print("No file staged for synchronization")
+    sys.exit()
 
-filename = "BloomFilter.py"
-user_file_content = []
+def createBloomFilter():
 
+    # read contents of file
+    user_file_content = []
+    with open(filename) as user_file:
+        for line in user_file:
+            user_file_content.append(line)
 
-with open(filename) as user_file:
+    # total # of line in the file
+    user_file_NOL = len(user_file_content)
 
-    for line in user_file:
-        user_file_content.append(line)
+    # creates bloomfilter of required size
+    bloom_filter = BloomFilter(user_file_NOL)   
 
-user_file_NOL = len(user_file_content)
+    # insert into BF
+    for blocks in user_file_content:
+        bloom_filter.insert(blocks)
 
-bloom_filter = BloomFilter(user_file_NOL)
-
-for blocks in user_file_content:
-    bloom_filter.insert(blocks)
-
-print(bloom_filter.getBloomFilter())
-print(bloom_filter.getSize())
-print(bloom_filter.getNumberOfHashFunctions())
-
-print(user_file_content[1])
-print(bloom_filter.validate(user_file_content[1]))
-
-
-with open("test", "wb") as f:
-    for i in bloom_filter.getBloomFilter():
-        if i == 0:
-            f.write(b"0")
-        else:
-            f.write(b"1")
+    # create output file for BF transmission 
+    with open("bloomfilter.bin", "wb") as f:
+        for i in bloom_filter.getBloomFilter():
+            if i == 0:
+                f.write(b"0")
+            else:
+                f.write(b"1")
