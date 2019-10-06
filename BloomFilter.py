@@ -34,8 +34,8 @@ class BloomFilter:
                 return False
         return True
 
-    def readBloomFilterFromFile(self):
-        f = open("bloomfilter.bin", "rb")
+    def readBloomFilterFromFile(self,filename):
+        f = open(filename, "rb")
         self.validate_array = list(f.read())
         for i in range(0, len(self.validate_array)):
             self.validate_array[i] -= 48
@@ -54,7 +54,3 @@ class BloomFilter:
     def getNumberOfHashFunctions(self):
         return self.k
 
-
-# bf = BloomFilter(5)
-# bf.readBloomFilterFromFile()
-# print(bf.validate('print("something")'))

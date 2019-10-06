@@ -9,8 +9,6 @@ except IndexError:
     sys.exit()
 
 
-
-
 def sendBloomFilter():
 
     # total # of line in the file
@@ -44,7 +42,7 @@ def sendBloomFilter():
 
 def readBloomFilter(n):
     receivedBF = BloomFilter(n)
-    receivedBF.readBloomFilterFromFile()
+    receivedBF.readBloomFilterFromFile("bloomfilter.bin")
     user_file_content ={}
     with open(filename) as user_file:
         for line in user_file:
