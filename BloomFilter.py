@@ -56,3 +56,6 @@ class BloomFilter:
     def getNumberOfHashFunctions(self):
         return self.k
 
+    def getAsBytes(self):
+        return bytes(self.bit_array)
+
