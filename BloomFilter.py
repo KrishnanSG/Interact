@@ -20,14 +20,16 @@ class BloomFilter:
 
     # Func to insert values into BF
     def insert(self, value, freq=1):
+        line_hash = str(mmh3.hash(value,freq))
         for i in range(self.k):
-            index = mmh3.hash(value, i+freq) % self.size
+            index = mmh3.hash(line_hash,i) % self.size
             self.bit_array[index] = 1
 
     # To check if the value is present in BF or not
     def validate(self, value, freq=1):
+        line_hash = str(mmh3.hash(value,freq))
         for i in range(self.k):
-            check_at_index = mmh3.hash(value, i+freq) % self.size
+            check_at_index = mmh3.hash(line_hash,i) % self.size
             if self.validate_array[check_at_index] == 1:
                 continue
             else:
