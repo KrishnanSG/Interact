@@ -26,7 +26,7 @@ input_path = os.path.abspath(input_path)
 
 
 if not os.path.isfile(input_path):
-    print(input_path, '- Not a valid file to stage for syncing')
+    print('\n',input_path, '- Not a valid file to stage for syncing')
     sys.exit()
 
 def on_modified(event):
@@ -98,7 +98,7 @@ def readBloomFilter(n):
     receivedBF = BloomFilter(n)
     receivedBF.readBloomFilterFromFile("bloomfilter.bin")
     user_file_content ={}
-    with open(filename) as user_file:
+    with open(input_path) as user_file:
         for line in user_file:
             try:
                 user_file_content[line]+=1
