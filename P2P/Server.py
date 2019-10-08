@@ -1,99 +1,76 @@
 import socket
-from _thread import *
-import threading
 import sys
+import time
 
-print_lock = threading.Lock()
+class Networking:
+    # Variable to tell if the current user is host or client
+    status = ""
+    def create_host(self):
+        self.status="host"
+        server = socket.socket()
+        host = socket.gethostname()
 
-def client_req():
+        server.bind((host,5050))
 
-    PORT=5051
-
-    client = socket.socket()
-    host = socket.gethostname()
-
-    client.connect(('192.168.43.166',PORT))
-    client.send(b"Hi Server")
-    print("client listening on Port 5051 ...")
-
-    with open('received_file', 'wb') as f:
-        print('file opened')
+        print("\nHi ",host," we have hosted the server at")
+        print("IP:",server.getsockname()[0])
+        print("Port:",server.getsockname()[1])
+        print("Share IP and Port with your friend to start sync.\n")
+        server.listen()
+        c, client_addr = server.accept()
+        print("Incoming request from", client_addr)
         while True:
-            print('receiving data...')
-            data = client.recv(1024)
-            print('data=', (data))
-            if not data:
-                break
-            # write data to a file
-            f.write(data)
+            try:
+                if input("Do u want to send:")=='y':
+                    text=input("Enter text:")
+                    
+                    c.send(str.encode(text))
+                else:
+                    data = c.recv(1024)
+                    print('data=', repr(data))
+                
 
-    f.close()
-
-    print('Successfully got the file')
-
-    print("Data from server:",client.recv(1024))
-
-    client.close()
+            except KeyboardInterrupt:
+                server.close()
+            
 
 
-def create_server():
-    PORT = 5050
+    def create_client(self,ip,port):
+        self.status="client"
+        client = socket.socket()
+        host = socket.gethostname()
+        client.connect((ip,port))
+        print("\nHi ",host," you are succesfully connected to")
+        print("IP:",ip)
+        print("Port:",port)
 
-    server = socket.socket()
-    host = socket.gethostname()
+        #try:
+        while True:
+            
+            if input("Do u want to send")=='y':
+                text=input("Enter text:")
+                client.send(str.encode(text))
+            else:
+                data = client.recv(1024)
+                print('data=', repr(data))
+            
+                
 
-    server.bind((host, PORT))
-    server.listen()
+        # to handle error while client connection
+        # except:
+        #    print("Invaild credentials. Make sure your friend has started the server.")
 
-    print("Server listening on Port 5050 ...")
+        
+p2p = Networking()
+if sys.argv[1]=='1':
+    p2p.create_host()
+else:
+    p2p.create_client("192.168.43.37",5050)
 
-    while True:
-        try:
-            c, client_addr = server.accept()
-            print("Someone connected from ", client_addr)
+    
+    
 
-            data = c.recv(1024)
-            print("Server Received ", repr(data))
-
-            filename = '../README.md'
-            f = open(filename, 'rb')
-            l = f.read(1024)
-            while (l):
-                c.send(l)
-                print('Sent ', repr(l))
-                l = f.read(1024)
-            f.close()
-
-            print('Done sending')
-
-            c.send(b"Thank you for connecting")
-
-            c.close()
-        except KeyboardInterrupt:
-            server.close()
-            print("Prev")
-            exit()
-
-print("Program starts")
-
-def create_client_req():
-    try:
-        ch = input("Do you want to create server request? (y/n)")
-        while ch=='y':
-            client_req()
-            ch = input("Do you want to create server request? (y/n)")
-        print("Completed all requests")
-        print_lock.release()
-    except EOFError:
-        print_lock.release()
-        exit()
-
-
-print()
-print_lock.acquire()
-start_new_thread(create_client_req, ())
-create_server()
-
+    
 
 
 
