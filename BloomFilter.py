@@ -57,5 +57,5 @@ class BloomFilter:
         return self.k
 
     def getAsBytes(self):
-        return bytes(self.bit_array)
+        return str.encode(''.join([str(i) for i in self.bit_array]))
 
