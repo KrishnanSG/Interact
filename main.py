@@ -43,8 +43,9 @@ def on_modified(event):
         # Ignore all other changes
         print(f"Detected changes {event.src_path} has been modified")
         print("Redrawing the bloom filter ...")
+        print("Sending the bloom filter ...")
         bf = sendBloomFilter()
-        p2p.send_data(bf.getAsBytes())
+        p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_BLOOMFILTER)
 
 
 class FileEventHandler(PatternMatchingEventHandler):
@@ -89,7 +90,24 @@ def main():
 
     try:
         while True:
-            p2p.check_if_incoming_data()
+            a = p2p.check_if_incoming_data()
+            print(a)
+            request_type, request_data = a[0], a[1]
+            # print(request_type, request_data)
+            # print(p2p.check_if_incoming_data())
+            if(request_type == NetworkManager.REQUEST_BLOOMFILTER):
+                # The opposite party has sent its bloom filter and now requesting ours
+                # We send it now
+                print("Received the bloom filter, acknowleding and transmitting the bloom filter")
+                bf = sendBloomFilter()
+                p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
+
+            elif(request_type == NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER):
+                
+                print("Request was acknowledged by the other peer and has given the other bloom filter")
+                ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
+
+
             # p2p.check_pending_outgoing()
             # p2p.send_data("sadasdasdasdffd")
             time.sleep(1)
