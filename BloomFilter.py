@@ -43,7 +43,13 @@ class BloomFilter:
             self.validate_array[i] -= 48
         print(self.validate_array)
         f.close()
-
+    
+    def readBloomFilterFromBytes(self,bf_as_bytes):
+        self.validate_array = bf_as_bytes
+        for i in range(0, len(self.validate_array)):
+            self.validate_array[i] -= 48
+        print(self.validate_array)
+    
     # Returns the bit array
     def getBloomFilter(self):
         return self.bit_array
@@ -52,10 +58,12 @@ class BloomFilter:
     def getSize(self):
         return self.size
 
+    def getNFromSize(self,size):
+        return(math.floor(size*-1*(math.log(2)**2)/math.log(self.p)))
+
     # Returns the # of Hash Functions ie. h1(k), h2(k) ...
     def getNumberOfHashFunctions(self):
         return self.k
 
     def getAsBytes(self):
         return str.encode(''.join([str(i) for i in self.bit_array]))
-
