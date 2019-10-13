@@ -44,6 +44,7 @@ class RequestReceivedHandler:
             if(request.get_type() == utils.Request.REQUEST_TYPE_BLOOMFILTER):
                 # The opposite party has sent its bloom filter and now requesting ours
                 # We send it now
+                print("\n\nThe other user has modified his file, syncing...")
                 print("Received the bloom filter")
                 my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
                 print("Acknowleding and transmitting the bloom filter...")
@@ -57,6 +58,7 @@ class RequestReceivedHandler:
                 my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
 
                 ## Send the missing contents computed to the other user
+                print("Sending the actual changed lines ...")
                 req = utils.Request(utils.Request.REQUEST_SEND_ACTUAL_LINES, str(my_missing_content))
                 p2p.send_request(req)
 
@@ -64,7 +66,9 @@ class RequestReceivedHandler:
                 print("Received the actual missing lines...")
                 missing_dict = eval(request.actual_message())
                 should_trigger_modified = False
+                print("Syncing the file...")
                 Synchronizer.syncFile(input_path, my_missing_content, missing_dict)
+                print("Done.")
                 time.sleep(1)
                 should_trigger_modified = True
 
@@ -80,7 +84,7 @@ def on_modified(event):
     if (os.path.abspath(event.src_path) == input_path) and should_trigger_modified:
         # Detect changes from only the given path.
         # Ignore all other changes
-        print(f"Detected changes {event.src_path} has been modified")
+        print(f"\n\nDetected changes - {event.src_path} has been modified...")
         initiateSync()
 class FileEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False,
