@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import time
+from math import floor,log
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -61,6 +62,12 @@ class FileEventHandler(PatternMatchingEventHandler):
             self.on_modified_callback(event)
             self.last_modified = time.time()
         return super().on_modified(event)
+
+# Use this func to find n required for BloomFilter
+# Size is the len of bloomfilter bit array
+def getNFromSize(size):
+    return(floor(size*-1*(log(2)**2)/log(0.05)))
+
 def main():
     print("Starting server...")
     print("Watching", input_path, "for changes...")
@@ -102,15 +109,23 @@ def main():
                 bf = sendBloomFilter()
                 p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
                 print("---------BF from user2--------------")
-                print(request_data[:-4])
                 
+                # Example
+                # bf_bytes = request_data[:-4]
+                # missing_content = getMissingContent(getNFromSize(len(bf_bytes)),bf_bytes)
+                # follow next step refer P2P/READEME.md 
 
             elif(request_type == NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER):
                 
                 print("Request was acknowledged by the other peer and has given the other bloom filter")
                 print("---------BF from user2--------------")
                 print(request_data[:-4])
-                getMissingContent(request_data)
+                
+                # Example
+                # bf_bytes = request_data[:-4]
+                # missing_content = getMissingContent(getNFromSize(len(bf_bytes)),bf_bytes)
+                # follow next step refer P2P/READEME.md
+                
                 ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
 
             
@@ -155,10 +170,10 @@ def sendBloomFilter():
     return bloom_filter
 
 
-def getMissingContent(n):
+def getMissingContent(n,bloomfilter_bytes):
     missing_content={}
     receivedBF = BloomFilter(n)
-    receivedBF.readBloomFilterFromFile("bloomfilter.bin")
+    receivedBF.readBloomFilterFromBytes(bloomfilter_bytes)
     user_file_content ={}
     line_number=0
     with open(input_path) as user_file:
@@ -171,7 +186,6 @@ def getMissingContent(n):
             if not receivedBF.validate(line):
                 missing_content[line_number]=line
                 return(missing_content)
-
 
 
 if __name__ == "__main__":
