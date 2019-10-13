@@ -125,6 +125,7 @@ def main():
 
     if role==1:
         p2p.create_host()
+        initiateSync()
     else:
         ip = input("Enter an IP: ")
         #ip = '127.0.1.1' 
