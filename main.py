@@ -11,6 +11,7 @@ from BloomFilter import BloomFilter
 from P2P.Server import NetworkManager
 import utils
 import Synchronizer
+
 # Create the parser
 my_parser = argparse.ArgumentParser(description='Sync two files')
 
@@ -48,7 +49,7 @@ class RequestReceivedHandler:
                 my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
                 print(my_missing_content)
                 print("Acknowleding and transmitting the bloom filter...")
-                bf = sendBloomFilter()
+                bf = computeBloomFilter()
                 req = utils.Request(utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER, bf.getAsBytes())
                 p2p.send_request(req)
 
@@ -87,7 +88,7 @@ def on_modified(event):
         print(f"Detected changes {event.src_path} has been modified")
         print("Redrawing the bloom filter ...")
         print("Sending the bloom filter ...")
-        bf = sendBloomFilter()
+        bf = computeBloomFilter()
         # p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_BLOOMFILTER)
         req = utils.Request(utils.Request.REQUEST_TYPE_BLOOMFILTER, bf.getAsBytes())
         p2p.send_request(req)
@@ -147,7 +148,7 @@ def main():
         my_observer.stop()
         my_observer.join()
 
-def sendBloomFilter():
+def computeBloomFilter():
     filename = input_path
 
     # total # of line in the file
@@ -193,5 +194,4 @@ def getMissingContent(n,bloomfilter_bytes):
 
 
 if __name__ == "__main__":
-    
     main()
