@@ -53,8 +53,8 @@ class RequestReceivedHandler:
                 # We send it now
                 print("Received the bloom filter")
                 print(request)
-                missing = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
-                print(missing)
+                my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
+                print(my_missing_content)
                 print("Acknowleding and transmitting the bloom filter...")
                 bf = sendBloomFilter()
                 req = utils.Request(utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER, bf.getAsBytes())
@@ -90,7 +90,6 @@ if not os.path.isfile(input_path):
 
 def on_modified(event):
     if (os.path.abspath(event.src_path) == input_path) and should_trigger_modified:
-        import pdb; pdb.set_trace()
         # Detect changes from only the given path.
         # Ignore all other changes
         print(f"Detected changes {event.src_path} has been modified")
