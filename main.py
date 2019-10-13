@@ -10,7 +10,7 @@ from watchdog.observers import Observer
 from BloomFilter import BloomFilter
 from P2P.Server import NetworkManager
 import utils
-
+import Synchronizer
 # Create the parser
 my_parser = argparse.ArgumentParser(description='Sync two files')
 
@@ -37,18 +37,24 @@ role = args.Role
 # This is set to none to indicate that no transaction is in progress.
 # I have to figure out how to handle concurrent requests
 is_master = None
- 
+
+my_missing_content = {}
+shoudlTriggerModified = True
+
 class RequestReceivedHandler:
     # def __init__(self):
         # self.socket = socket
 
     def handle_request(self, request):
+            global my_missing_content, shoudlTriggerModified
             # print("DEBUG :: Received request - "  + str(request))
             if(request.get_type() == utils.Request.REQUEST_TYPE_BLOOMFILTER):
                 # The opposite party has sent its bloom filter and now requesting ours
                 # We send it now
                 print("Received the bloom filter")
                 print(request)
+                missing = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
+                print(missing)
                 print("Acknowleding and transmitting the bloom filter...")
                 bf = sendBloomFilter()
                 req = utils.Request(utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER, bf.getAsBytes())
@@ -58,8 +64,20 @@ class RequestReceivedHandler:
             elif(request.get_type() == utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER):
                 print("Request was acknowledged by the other peer and has given the other bloom filter")
                 print(request)
-                ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
+                my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
+                print(my_missing_content)
 
+                ## Send the missing contents computed to the other user
+                req = utils.Request(utils.Request.REQUEST_SEND_ACTUAL_LINES, str(my_missing_content))
+                p2p.send_request(req)
+
+            elif(request.get_type() == utils.Request.REQUEST_SEND_ACTUAL_LINES):
+                print("Received the actual missing lines...")
+                print(request)
+                missing_dict = eval(request.actual_message())
+                shoudlTriggerModified = False
+                Synchronizer.syncFile(input_path, my_missing_content, missing_dict)
+                shoudlTriggerModified = True
 
 
 rh = RequestReceivedHandler()
@@ -70,7 +88,7 @@ if not os.path.isfile(input_path):
     sys.exit()
 
 def on_modified(event):
-    if os.path.abspath(event.src_path) == input_path:
+    if os.path.abspath(event.src_path) == input_path and shoudlTriggerModified:
         # Detect changes from only the given path.
         # Ignore all other changes
         print(f"Detected changes {event.src_path} has been modified")
@@ -204,7 +222,7 @@ def getMissingContent(n,bloomfilter_bytes):
                 user_file_content[line]=1
             if not receivedBF.validate(line):
                 missing_content[line_number]=line
-                return(missing_content)
+    return(missing_content)
 
 
 if __name__ == "__main__":
