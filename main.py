@@ -39,14 +39,14 @@ role = args.Role
 is_master = None
 
 my_missing_content = {}
-shoudlTriggerModified = True
+should_trigger_modified = True
 
 class RequestReceivedHandler:
     # def __init__(self):
         # self.socket = socket
 
     def handle_request(self, request):
-            global my_missing_content, shoudlTriggerModified
+            global my_missing_content, should_trigger_modified
             # print("DEBUG :: Received request - "  + str(request))
             if(request.get_type() == utils.Request.REQUEST_TYPE_BLOOMFILTER):
                 # The opposite party has sent its bloom filter and now requesting ours
@@ -75,9 +75,10 @@ class RequestReceivedHandler:
                 print("Received the actual missing lines...")
                 print(request)
                 missing_dict = eval(request.actual_message())
-                shoudlTriggerModified = False
+                should_trigger_modified = False
                 Synchronizer.syncFile(input_path, my_missing_content, missing_dict)
-                shoudlTriggerModified = True
+                time.sleep(1)
+                should_trigger_modified = True
 
 
 rh = RequestReceivedHandler()
@@ -88,7 +89,8 @@ if not os.path.isfile(input_path):
     sys.exit()
 
 def on_modified(event):
-    if os.path.abspath(event.src_path) == input_path and shoudlTriggerModified:
+    if (os.path.abspath(event.src_path) == input_path) and should_trigger_modified:
+        import pdb; pdb.set_trace()
         # Detect changes from only the given path.
         # Ignore all other changes
         print(f"Detected changes {event.src_path} has been modified")
