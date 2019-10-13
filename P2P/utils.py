@@ -22,8 +22,9 @@ class Request:
 
     def get_type(self):
         return self.type
+
     def get_message_size(self):
-        pass
+        return len(self.actual_message())
 
     def actual_message(self):
         return self.byte_message.decode('utf-8')
