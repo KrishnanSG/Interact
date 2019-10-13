@@ -86,13 +86,7 @@ def on_modified(event):
         # Detect changes from only the given path.
         # Ignore all other changes
         print(f"Detected changes {event.src_path} has been modified")
-        print("Redrawing the bloom filter ...")
-        print("Sending the bloom filter ...")
-        bf = computeBloomFilter()
-        # p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_BLOOMFILTER)
-        req = utils.Request(utils.Request.REQUEST_TYPE_BLOOMFILTER, bf.getAsBytes())
-        p2p.send_request(req)
-
+        initiateSync()
 class FileEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False,
                     on_modified_callback=on_modified):
@@ -191,6 +185,14 @@ def getMissingContent(n,bloomfilter_bytes):
             if not receivedBF.validate(line):
                 missing_content[line_number]=line
     return(missing_content)
+
+
+def initiateSync():
+    print("Redrawing the bloom filter ...")
+    bf = computeBloomFilter()
+    print("Sending the bloom filter ...")
+    req = utils.Request(utils.Request.REQUEST_TYPE_BLOOMFILTER, bf.getAsBytes())
+    p2p.send_request(req)
 
 
 if __name__ == "__main__":
