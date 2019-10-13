@@ -33,18 +33,10 @@ input_path = args.Path
 input_path = os.path.abspath(input_path)
 role = args.Role
 
-# This user will be the master if he has done the modifications to a file and has initiated the syncing process
-# This is set to none to indicate that no transaction is in progress.
-# I have to figure out how to handle concurrent requests
-is_master = None
-
 my_missing_content = {}
 should_trigger_modified = True
 
 class RequestReceivedHandler:
-    # def __init__(self):
-        # self.socket = socket
-
     def handle_request(self, request):
             global my_missing_content, should_trigger_modified
             # print("DEBUG :: Received request - "  + str(request))
@@ -99,7 +91,6 @@ def on_modified(event):
         # p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_BLOOMFILTER)
         req = utils.Request(utils.Request.REQUEST_TYPE_BLOOMFILTER, bf.getAsBytes())
         p2p.send_request(req)
-        is_master = True
 
 class FileEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False,
@@ -137,7 +128,6 @@ def main():
     
     my_observer.start()
 
-
     if role==1:
         p2p.create_host()
     else:
@@ -149,9 +139,9 @@ def main():
 
     try:
         while True:
+            # This handles the request appropriately
             a = p2p.check_if_incoming_data()
             # request_type, request_data = a[0], a[1]
-
             time.sleep(1)
     except KeyboardInterrupt:
         my_observer.stop()
