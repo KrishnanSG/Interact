@@ -48,8 +48,7 @@ class BloomFilter:
         self.validate_array = list(bf_as_bytes)
         for i in range(0, len(self.validate_array)):
             self.validate_array[i] -= 48
-        print(self.validate_array)
-    
+
     # Returns the bit array
     def getBloomFilter(self):
         return self.bit_array

@@ -45,9 +45,7 @@ class RequestReceivedHandler:
                 # The opposite party has sent its bloom filter and now requesting ours
                 # We send it now
                 print("Received the bloom filter")
-                print(request)
                 my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
-                print(my_missing_content)
                 print("Acknowleding and transmitting the bloom filter...")
                 bf = computeBloomFilter()
                 req = utils.Request(utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER, bf.getAsBytes())
@@ -56,9 +54,7 @@ class RequestReceivedHandler:
             # p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
             elif(request.get_type() == utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER):
                 print("Request was acknowledged by the other peer and has given the other bloom filter")
-                print(request)
                 my_missing_content = getMissingContent(getNFromSize(request.get_message_size()), request.get_message_bytes())
-                print(my_missing_content)
 
                 ## Send the missing contents computed to the other user
                 req = utils.Request(utils.Request.REQUEST_SEND_ACTUAL_LINES, str(my_missing_content))
@@ -66,7 +62,6 @@ class RequestReceivedHandler:
 
             elif(request.get_type() == utils.Request.REQUEST_SEND_ACTUAL_LINES):
                 print("Received the actual missing lines...")
-                print(request)
                 missing_dict = eval(request.actual_message())
                 should_trigger_modified = False
                 Synchronizer.syncFile(input_path, my_missing_content, missing_dict)

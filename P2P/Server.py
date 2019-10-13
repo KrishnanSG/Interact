@@ -27,8 +27,6 @@ class NetworkManager:
 
 
     def send_request(self, request):
-            print("Sending data...")
-            print(request)
             self.socket.send(request.get_type_byte() + request.get_message_bytes())
 
     def create_host(self):
