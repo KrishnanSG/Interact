@@ -45,7 +45,7 @@ class BloomFilter:
         f.close()
     
     def readBloomFilterFromBytes(self,bf_as_bytes):
-        self.validate_array = bf_as_bytes
+        self.validate_array = list(bf_as_bytes)
         for i in range(0, len(self.validate_array)):
             self.validate_array[i] -= 48
         print(self.validate_array)
