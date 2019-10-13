@@ -82,8 +82,8 @@ def main():
     if role==1:
         p2p.create_host()
     else:
-        # ip = input("Enter an IP: ")
-        ip = '127.0.1.1' 
+        ip = input("Enter an IP: ")
+        #ip = '127.0.1.1' 
         port = int(input("Enter a PORT: "))
         p2p.create_client(ip,port)
 
@@ -91,7 +91,7 @@ def main():
     try:
         while True:
             a = p2p.check_if_incoming_data()
-            print(a)
+            
             request_type, request_data = a[0], a[1]
             # print(request_type, request_data)
             # print(p2p.check_if_incoming_data())
@@ -101,13 +101,19 @@ def main():
                 print("Received the bloom filter, acknowleding and transmitting the bloom filter")
                 bf = sendBloomFilter()
                 p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
+                print("---------BF from user2--------------")
+                print(request_data[:-4])
+                
 
             elif(request_type == NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER):
                 
                 print("Request was acknowledged by the other peer and has given the other bloom filter")
+                print("---------BF from user2--------------")
+                print(request_data[:-4])
+                getMissingContent(request_data)
                 ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
 
-
+            
             # p2p.check_pending_outgoing()
             # p2p.send_data("sadasdasdasdffd")
             time.sleep(1)
@@ -149,18 +155,22 @@ def sendBloomFilter():
     return bloom_filter
 
 
-def readBloomFilter(n):
+def getMissingContent(n):
+    missing_content={}
     receivedBF = BloomFilter(n)
     receivedBF.readBloomFilterFromFile("bloomfilter.bin")
     user_file_content ={}
+    line_number=0
     with open(input_path) as user_file:
         for line in user_file:
+            line_number+=1
             try:
                 user_file_content[line]+=1
             except:
                 user_file_content[line]=1
             if not receivedBF.validate(line):
-                print(line,end='')
+                missing_content[line_number]=line
+                return(missing_content)
 
 
 
