@@ -2,6 +2,7 @@ import socket
 import sys
 import time
 
+from . import utils
 
 class NetworkManager:
 
@@ -17,29 +18,34 @@ class NetworkManager:
     status = ""
     queue = []
 
+    def __init__(self, request_handler):
+        self.handler = request_handler
+
     def check_if_incoming_data(self):
         try:
             # TODO: Make it work for more than 1kb of data
             data = self.socket.recv(1024)
 
-            print("Data received in ", self.status, ' data=', repr(data))
+            # print("Data received in ", self.status, ' data=', repr(data))
 
-            padding = data[0:4]
-            if padding == bytes(self.REQUEST_BLOOMFILTER_PADDING):
-                bloom_filter = data[4:]
-                print("REQUEST_BLOOMFILTER_PADDING")
-                a = tuple([self.REQUEST_BLOOMFILTER, bloom_filter])
-                print(a)
-                return a
+            req = utils.parse_received_data(data)
+            
+            # padding = data[0:4]
+            # if padding == bytes(self.REQUEST_BLOOMFILTER_PADDING):
+            #     bloom_filter = data[4:]
+            #     print("REQUEST_BLOOMFILTER_PADDING")
+            #     a = tuple([self.REQUEST_BLOOMFILTER, bloom_filter])
+            #     print(a)
+            #     return a
 
-            elif padding == bytes(self.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER_PADDING):
-                bloom_filter = data[4:]
-                print("REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER")
-                return tuple([self.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER, bloom_filter])
-
+            # elif padding == bytes(self.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER_PADDING):
+            #     bloom_filter = data[4:]
+            #     print("REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER")
+            #     return tuple([self.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER, bloom_filter])
+            self.handler.handle_request(req)
             return tuple([00, ''])
         except BlockingIOError as e:
-            print(e)
+            # print(e)
             # No data to read
             return tuple([00, ''])
             
@@ -62,13 +68,32 @@ class NetworkManager:
             # print("Sending data from server...")
             # self.socket.send(str.encode("abcdefgh"))
 
+    def send_request(self, request):
+        # if(self.status=="client"):
+            # print(self.socket)
+            # if request_type == self.REQUEST_BLOOMFILTER:
+            #     padding = bytes(self.REQUEST_BLOOMFILTER_PADDING)
+            # elif request_type == self.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER:
+            #     padding = bytes(self.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER_PADDING)
+
+            print("Sending data...")
+            print(request)
+            # if isinstance(data, bytes):
+            #     data = padding + data
+            #     self.socket.send(data)
+            # else:
+            #     self.socket.send(padding + str.encode(data))
+            self.socket.send(request.get_type_byte() + request.get_message_bytes())
+        # else:
+            # print("Sending data from server...")
+            # self.socket.sen
 
     def create_host(self):
         self.status="host"
         server = socket.socket()
         host = socket.gethostname()
 
-        server.bind((host,5051))
+        server.bind((host, 5051))
         self.socket = server
         print("\nHi ",host," we have hosted the server at")
         print("IP:",server.getsockname()[0])

@@ -9,6 +9,7 @@ from watchdog.observers import Observer
 
 from BloomFilter import BloomFilter
 from P2P.Server import NetworkManager
+import utils
 
 # Create the parser
 my_parser = argparse.ArgumentParser(description='Sync two files')
@@ -32,7 +33,37 @@ input_path = args.Path
 input_path = os.path.abspath(input_path)
 role = args.Role
 
-p2p = NetworkManager()
+# This user will be the master if he has done the modifications to a file and has initiated the syncing process
+# This is set to none to indicate that no transaction is in progress.
+# I have to figure out how to handle concurrent requests
+is_master = None
+ 
+class RequestReceivedHandler:
+    # def __init__(self):
+        # self.socket = socket
+
+    def handle_request(self, request):
+            # print("DEBUG :: Received request - "  + str(request))
+            if(request.get_type() == utils.Request.REQUEST_TYPE_BLOOMFILTER):
+                # The opposite party has sent its bloom filter and now requesting ours
+                # We send it now
+                print("Received the bloom filter")
+                print(request)
+                print("Acknowleding and transmitting the bloom filter...")
+                bf = sendBloomFilter()
+                req = utils.Request(utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER, bf.getAsBytes())
+                p2p.send_request(req)
+
+            # p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
+            elif(request.get_type() == utils.Request.REQUEST_TYPE_REPLY_SLAVE_BLOOMFILTER):
+                print("Request was acknowledged by the other peer and has given the other bloom filter")
+                print(request)
+                ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
+
+
+
+rh = RequestReceivedHandler()
+p2p = NetworkManager(rh)
 
 if not os.path.isfile(input_path):
     print('\n',input_path, '- Not a valid file to stage for syncing')
@@ -46,8 +77,10 @@ def on_modified(event):
         print("Redrawing the bloom filter ...")
         print("Sending the bloom filter ...")
         bf = sendBloomFilter()
-        p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_BLOOMFILTER)
-
+        # p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_BLOOMFILTER)
+        req = utils.Request(utils.Request.REQUEST_TYPE_BLOOMFILTER, bf.getAsBytes())
+        p2p.send_request(req)
+        is_master = True
 
 class FileEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False,
@@ -98,35 +131,21 @@ def main():
     try:
         while True:
             a = p2p.check_if_incoming_data()
-            
+            # print(a)
             request_type, request_data = a[0], a[1]
             # print(request_type, request_data)
             # print(p2p.check_if_incoming_data())
-            if(request_type == NetworkManager.REQUEST_BLOOMFILTER):
-                # The opposite party has sent its bloom filter and now requesting ours
-                # We send it now
-                print("Received the bloom filter, acknowleding and transmitting the bloom filter")
-                bf = sendBloomFilter()
-                p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
-                print("---------BF from user2--------------")
-                
-                # Example
-                # bf_bytes = request_data[:-4]
-                # missing_content = getMissingContent(getNFromSize(len(bf_bytes)),bf_bytes)
-                # follow next step refer P2P/READEME.md 
+            # if(request_type == NetworkManager.REQUEST_BLOOMFILTER):
+            #     # The opposite party has sent its bloom filter and now requesting ours
+            #     # We send it now
+            #     print("Received the bloom filter, acknowleding and transmitting the bloom filter")
+            #     bf = sendBloomFilter()
+            #     p2p.send_data(bf.getAsBytes(), NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER)
 
-            elif(request_type == NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER):
+            # elif(request_type == NetworkManager.REQUEST_ACKNOWLEDGE_SEND_BLOOMFILTER):
                 
-                print("Request was acknowledged by the other peer and has given the other bloom filter")
-                print("---------BF from user2--------------")
-                print(request_data[:-4])
-                
-                # Example
-                # bf_bytes = request_data[:-4]
-                # missing_content = getMissingContent(getNFromSize(len(bf_bytes)),bf_bytes)
-                # follow next step refer P2P/READEME.md
-                
-                ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
+            #     print("Request was acknowledged by the other peer and has given the other bloom filter")
+            #     ## TODO: Do whatever to be done when we have given the original request and got the other bloom filter
 
             
             # p2p.check_pending_outgoing()
