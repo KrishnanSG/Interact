@@ -9,7 +9,7 @@ from watchdog.observers import Observer
 
 from BloomFilter import BloomFilter
 from P2P.Server import NetworkManager
-import utils
+from P2P import utils
 import Synchronizer
 
 # Create the parser
@@ -84,7 +84,7 @@ def on_modified(event):
     if (os.path.abspath(event.src_path) == input_path) and should_trigger_modified:
         # Detect changes from only the given path.
         # Ignore all other changes
-        print(f"\n\nDetected changes - {event.src_path} has been modified...")
+        print("\n\nDetected changes - ",event.src_path,"py has been modified...")
         initiateSync()
 class FileEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False,
@@ -182,7 +182,7 @@ def getMissingContent(n,bloomfilter_bytes):
                 user_file_content[line]+=1
             except:
                 user_file_content[line]=1
-            if not receivedBF.validate(line):
+            if not receivedBF.validate(line,freq=user_file_content[line]):
                 missing_content[line_number]=line
     return(missing_content)
 
