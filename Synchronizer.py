@@ -1,6 +1,6 @@
 
 def syncFile(filename,my_missing_content,received_missing_content):
-
+    
     file_content=[]
     lines_to_insert=[]
 
@@ -23,8 +23,8 @@ def syncFile(filename,my_missing_content,received_missing_content):
         file_content.insert(i-1,received_missing_content[i])
     
     # Line deletion
-    for i in my_missing_content.values():
-        file_content.remove(i)
+    for i in my_missing_content.keys():
+        file_content.pop(i-1)
 
     # Write into file
     with open(filename,'w') as f:
