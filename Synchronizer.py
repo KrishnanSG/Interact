@@ -1,4 +1,4 @@
-
+import mmh3
 def syncFile(filename,my_missing_content,received_missing_content):
     
     file_content=[]
@@ -29,3 +29,11 @@ def syncFile(filename,my_missing_content,received_missing_content):
     # Write into file
     with open(filename,'w') as f:
         f.writelines(file_content)
+
+def computeHash(filename):
+    # returns 4 byte hash value of the file
+    file_reader = open(filename,"rb")
+    file_contents = file_reader.read()
+    n=abs(mmh3.hash(file_contents)) % 2**32
+    return (n.to_bytes((n.bit_length()+7)//8,'big'))
+
