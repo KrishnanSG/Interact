@@ -24,7 +24,10 @@ class NetworkManager:
             # print(e)
             # No data to read
             return tuple([00, ''])
-
+        except (ConnectionResetError, ValueError) as e:
+            ## ValueError is raised from parse_received_data
+            print("\n\nUh-oh. looks like peer has closed the connection :(")
+            exit()
 
     def send_request(self, request):
             self.socket.send(request.get_type_byte() + request.get_message_bytes())
