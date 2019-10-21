@@ -68,10 +68,38 @@ class RequestReceivedHandler:
                 should_trigger_modified = False
                 print("Syncing the file...")
                 Synchronizer.syncFile(input_path, my_missing_content, missing_dict)
+                print("Verifying that the file is up-to-date ...")
+                print("Verifying hash...")
+                final_hash = Synchronizer.computeHash(input_path)
+                req = utils.Request(utils.Request.REQUEST_SEND_ENTIRE_FILE_HASH, final_hash)
+                p2p.send_request(req)
                 print("Done.")
                 time.sleep(1)
                 should_trigger_modified = True
 
+            elif(request.get_type() == utils.Request.REQUEST_SEND_ENTIRE_FILE_HASH):
+                print("Received the hash from the other side ...")
+                print("Verifying hash...")
+                hash_from_other_user = request.get_message_bytes()
+                our_hash = Synchronizer.computeHash(input_path)
+
+                if hash_from_other_user == our_hash:
+                    print("Done verifying hash.")
+                    print("Done.")
+                else:
+                    print("Uh-oh")
+                    print("Making sure things are fine everywhere...")
+                    req = utils.Request(utils.Request.REQUEST_SEND_ENTIRE_FILE, read_entire_file())
+                    p2p.send_request(req)
+            elif(request.get_type() == utils.Request.REQUEST_SEND_ENTIRE_FILE):
+                print("Looks like we have some trouble syncing ...")
+                print("Making sure we are allright...")
+                file_content_from_other_user = request.actual_message()
+
+                with open(input_path, 'w') as f:
+                    f.write(file_content_from_other_user)
+
+                print("Everything is back under control!")
 
 rh = RequestReceivedHandler()
 p2p = NetworkManager(rh)
@@ -194,6 +222,10 @@ def initiateSync():
     req = utils.Request(utils.Request.REQUEST_TYPE_BLOOMFILTER, bf.getAsBytes())
     p2p.send_request(req)
 
+def read_entire_file():
+    with open(input_path) as f:
+        content = f.read()
+        return content
 
 if __name__ == "__main__":
     main()
