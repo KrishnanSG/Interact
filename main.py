@@ -95,10 +95,12 @@ class RequestReceivedHandler:
                 print("Looks like we have some trouble syncing ...")
                 print("Making sure we are allright...")
                 file_content_from_other_user = request.actual_message()
+                should_trigger_modified = False
 
                 with open(input_path, 'w') as f:
                     f.write(file_content_from_other_user)
-
+                time.sleep(1)
+                should_trigger_modified = True
                 print("Everything is back under control!")
 
 rh = RequestReceivedHandler()
