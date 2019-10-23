@@ -48,7 +48,6 @@ def parse_received_data(data):
         # Occurs sometimes when the contents received are not in utf-8
         # This can happen for example, when transmitting the hash value.
         str_message = bloom_filter
-    print(bytes.hex(type_specifying_byte))
     type_int = int(bytes.hex(type_specifying_byte), 16)
     req = Request(type_int, str_message)
     return req
