@@ -59,4 +59,4 @@ class NetworkManager:
         host = socket.gethostname()
         client.connect((ip,port))
         client.setblocking(False)
-        print("\nHi ",host," you are succesfully connected to")
+        print("\nHi ",host," you are succesfully connected")
