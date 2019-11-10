@@ -9,14 +9,12 @@ Each message will have this format
 
 ```
 
-Maybe pad all the messages with some delimiter bytes to seperate the different requests
-
 Once the BF is exchanged
 1. Call getMissingContent for both users
 2. Send the missing contents of user 1 to user 2
 3. Call merge function on user2 side
-4. Send entire file sha256 and check on both ends
+4. Send entire file hash value and check on both ends
     if equal
         done
     else
-        send the entire file
+        send the entire compressed file 
