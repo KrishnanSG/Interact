@@ -61,7 +61,6 @@ We will be using a few terms in the due course of the explanation.
 - **getMissingContent()** - a function to find the missing contents.
 - **syncFile()** - a function to merge (reproduce the changes on the destination).
 
-#### The Sync Cycle
 ![Sync-Protocol](https://user-images.githubusercontent.com/43802499/68604316-31986100-04d0-11ea-9f65-fce7b3cd8357.png)
 
 ### Conclusion
