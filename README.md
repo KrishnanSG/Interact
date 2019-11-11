@@ -1,6 +1,8 @@
 # Interact
 
 An easy to use real time file synchronization application built using Python.
+<img src="https://user-images.githubusercontent.com/43802499/68604424-71f7df00-04d0-11ea-9773-1d51344c8318.png" align="right"
+     title="File-Sync" width="220" height="250">
 
 ## Getting Started
 
@@ -60,15 +62,7 @@ We will be using a few terms in the due course of the explanation.
 - **syncFile()** - a function to merge (reproduce the changes on the destination).
 
 #### The Sync Cycle
-1. A file modification is detected and the sync cycle is initiated.
-2. User1 generates the BloomFilter based on the file contents and sends it to User2.
-3. On receiving the BloomFilter User2 genrates the BloomFilter based on the file contents and sends it to User1.
-4. Call getMissingContent for both users.
-5. The missing contents of User1 to User2 is sent.
-3. Call merge function on User2's computer.
-4. User2 compute hash for the file and sends it to User1.
-5. If the hash values match then end of cycle 
-   else one more sync cycle is performed or compressed copy of the file is sent, this is decided based on the number of changes and file size.
+![Sync-Protocol](https://user-images.githubusercontent.com/43802499/68604316-31986100-04d0-11ea-9f65-fce7b3cd8357.png)
 
 ### Conclusion
 The algorithm developed does synchronization effieciently since the size of the BloomFiter transmitted is in **bits** while the file would be in **MBs**.
