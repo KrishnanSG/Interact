@@ -47,9 +47,9 @@ The following steps will guide you on how to use this tool.
      ```
 3. Ask your friend to connect to the server
     ```
-        ./Interact <filename>
+        ./Interact.exe <filename>
 
-        Provide inputs for the prompt messages.
+        Provide inputs for the prompt messages
     ```
 
 #### Developer Stlye
@@ -66,7 +66,7 @@ The following steps will guide you on how to use this tool.
         Provide inputs for the prompt messages.
     ```
 
-3. Enjoy Interact :) . We automatically detect for modification made in the file, so just save the file.
+3. Enjoy Interact 😀. We automatically detect modification made in the file, so just save the file.
 
 > You may use the following command to get help regarding the tool
 ```
