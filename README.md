@@ -2,13 +2,20 @@
 
 An easy to use real time file synchronization application built using Python.
 <img src="https://user-images.githubusercontent.com/43802499/68604424-71f7df00-04d0-11ea-9773-1d51344c8318.png" align="right"
-     title="File-Sync" width="220" height="250">
+     title="Interact" width="35%" height="20%">
 
 ## Getting Started
 
-These instructions will get you a copy of the project and ready for on your local machine.
+These instructions will get you a copy of the project and ready for use on your local machine.
 
 ### Prerequisites
+
+  #### Quick Access
+  - Click on the link to download the tool - [Interact.zip](https://github.com/KrishnanSG/Interact/files/3835348/Interact.zip)
+  
+  - Extract the zip folder
+  
+  #### Developer Style
   - Python 3.7
 
   - Clone this repository using the command:
@@ -29,6 +36,24 @@ These instructions will get you a copy of the project and ready for on your loca
 You're almost there. 
 The following steps will guide you on how to use this tool.
 
+#### Quick Access
+> Use the following commands if you have downloaded the tool using steps described in quick access.
+
+1. Open your favourite terminal
+
+2. Creating host server
+     ```
+          ./Interact.exe <filename> --host
+     ```
+3. Ask your friend to connect to the server
+    ```
+        ./Interact <filename>
+
+        Provide inputs for the prompt messages.
+    ```
+
+#### Developer Stlye
+
 1. Creating host server
     ```
         python main.py <filename> --host
@@ -41,18 +66,29 @@ The following steps will guide you on how to use this tool.
         Provide inputs for the prompt messages.
     ```
 
-3. Enjoy the sync. We automatically detect for modification made in the file, so just save the file.
+3. Enjoy Interact :) . We automatically detect for modification made in the file, so just save the file.
+
+> You may use the following command to get help regarding the tool
+```
+     ./Interact.exe --help or python main.py --help
+```
 
 ## How does this work?
 
-Most the of the file synchronziers send the complete file across the network for every sync cycle.
+Most of the file synchronziers send the complete file across the network for every sync cycle, this causes unnecessary data transfer.
+
+Let's consider this case where you make a modification on line 10 but your file containing 1000 lines is sent across the network.
+
+" To solve this problem **Interact** was developed. "
 
 ### How we do it?
-**BloomFilters**
+
+**BloomFilter**
 
 A Bloom filter is a space-efficient probabilistic data structure that is used to test whether an element is a member of a set. Check out this [link](https://www.geeksforgeeks.org/bloom-filters-introduction-and-python-implementation/) to know more.
 
 ### The protocol
+
 We will be using a few terms in the due course of the explanation.
 - **Host** - the user who has intiated the P2P server.
 - **Client** - the user who connects to the host.
