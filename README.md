@@ -1,4 +1,7 @@
 # Interact
+[![CodeFactor](https://www.codefactor.io/repository/github/krishnansg/interact/badge/master)](https://www.codefactor.io/repository/github/krishnansg/interact/overview/master)
+[![GitHub license](https://img.shields.io/github/license/KrishnanSG/Interact)](https://github.com/KrishnanSG/Interact/blob/master/LICENSE)
+
 
 An easy to use real time file synchronization application built using Python.
 <img src="https://user-images.githubusercontent.com/43802499/68604424-71f7df00-04d0-11ea-9773-1d51344c8318.png" align="right"
